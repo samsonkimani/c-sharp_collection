@@ -158,7 +158,7 @@ public class Constant : Expression
         _value = value;
     }
 
-    public override double Evalueate(Dictionary<string, object> vars)
+    public override double Evaluate(Dictionary<string, object> vars)
     {
         return _value;
     }
@@ -204,6 +204,100 @@ public class Operation : Expression{
             default: throw new Exception($"Unknown operator: {_op}");
         }
     }
+}
+
+// function members of a class
+
+public class MyList<T>
+{
+    const int DefaultCapacity = 4;
+    T[] _items;
+    int _count;
+
+    public MyList(int capacity = DefaultCapacity)
+    {
+        _items = new T[capacity];
+    }
+
+    public int Count => _count;
+
+    public int Capacity
+    {
+        get => _items.Length;
+        set{
+            if (value < _count) value = _count;
+            if (value != _items.Length)
+            {
+                T[] newItems = new T[value];
+                Array.Copy(_items, 0, newItems, 0, _count);
+                _items = newItems;
+            }
+        }
+    }
+
+    public T this[int index]
+    {
+        get => _items[index];
+        set
+        {
+            if (!object.Equals(value, _items[index]))
+            {
+                _items[index] = value;
+                OnChanged();
+            }
+        }
+    }
+
+    public void Add(T item)
+    {
+        if (_count == Capacity) Capacity = _count * 2;
+        _items[_count] = item;
+        _count++;
+        OnChanged();
+    }
+
+    protected virtual void OnChanged()
+    {
+        Changed?.Invoke(this, EventArgs.Empty);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return base.Equals(obj);
+    }
+
+    static bool Equals(MyList<T> a, MyList<T> b)
+    {
+        if (Object.ReferenceEquals(a, null)) return Object.ReferenceEquals(b, null);
+        if (Object.ReferenceEquals(b, null) || a._count != b._count) return false;
+        for (int i = 0; i < a._count; i++)
+        {
+            if (!object.Equals(a._items[i], b._items[i]))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public override int GetHashCode()
+    {
+        int hash = 0;
+        foreach (var item in _items)
+        {
+            if (item != null)
+            {
+                hash = hash * 31 + item.GetHashCode();
+            }
+        }
+        return hash;
+    }
+
+    public event EventHandler Changed;
+
+    public static bool operator ==(MyList<T> a, MyList<T> b) => Equals(a, b);
+
+    public static bool operator !=(MyList<T> a, MyList<T> b) => !Equals(a, b);
 }
 
 public class Program
@@ -278,5 +372,30 @@ public class Program
         Console.WriteLine($"e1.GetSetialNo(): {e1.GetSerialNo()}");
         Console.WriteLine($"e2.GetSerialNo(): {e2.GetSerialNo()}");
         Console.WriteLine($"Entity.GetNextSerialNo(): {Entity.GetNextSerialNo()}");
+
+        Expression e = new Operation(
+            new VariableReference("x"),
+            '+', new Constant(2)
+        );
+
+        Dictionary<string, object> vars = new Dictionary<string, object>();
+        vars["x"] = 3;
+        Console.WriteLine(e.Evaluate(vars));
+
+        Expression en = new Operation(
+            new VariableReference("x"),
+            '*', new Operation(
+                new VariableReference("y"),
+                '+', new Constant(2)
+            )
+        );
+
+        Dictionary<string, object> vars2 = new();
+        vars2["x"] = 3;
+        vars2["y"] = 4;
+        Console.WriteLine(en.Evaluate(vars2));
+        vars2["y"] = 5;
+        vars2["x"] = 2;
+        Console.WriteLine(en.Evaluate(vars2));
     }
 }

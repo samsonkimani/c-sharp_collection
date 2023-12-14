@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "+V9IuSD8dzBMM8J5M1oEGYFnNfth1TuI9MBnfBMqQHQAvHnejcyh2cDH0bmAAd34nZ8KL/GNaUld72ThcjLgbA==",
+  "dgSpecHash": "EX7jwcCNRIDNyMnTrzIrVSzvDzHc3UqbZhe9EkvCGHEaX9yjWK/3hnYJhtYT2tKKDOcxN1JzRL871sBfwvUv7A==",
   "success": true,
-  "projectFilePath": "/home/samson/c-sharp/c-sharp.csproj",
+  "projectFilePath": "/home/samson/c-sharp_collection/c-sharp/c-sharp.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
